@@ -1,4 +1,4 @@
-#det här skitet behöver göras om helt.
+#NOT COMPLETE.
 
 MENU = {
     "espresso": {
@@ -39,6 +39,23 @@ quarter = 0.25
 
 money = 0
 
+def make_coffee(order_ingredients):
+    for item in order_ingredients:
+        resources[item] -= order_ingredients[item]
+
+def check_resources(order_ingredients):
+    for item in order_ingredients:
+        if order_ingredients[item] > resources[item]:
+            print(f"Sorry. Not enough {item}.")
+            return False
+    return True
+
+def check_money():
+    if money >= coffee_cost:
+        return True
+        
+    print("Not enough money. Refunded.")
+    return False
 
 while True:
     
@@ -52,7 +69,7 @@ while True:
         print(f"Coffe: {resources['coffee']}g")
         print(f"Money: ${'{:.2f}'.format(money)}")
     
-    elif resources['water'] >= MENU[user_input]['ingredients']['water']:
+    elif check_resources(MENU[user_input]["ingredients"]):
         if user_input == 'espresso' or user_input == 'latte' or user_input == 'cappuccino':
             print("Please insert coins.")
             pennys = int(input("How many pennys?: "))
@@ -76,22 +93,14 @@ while True:
         coffee_cost = MENU[user_input]['cost']
         change = round(total - coffee_cost, 2)
 
-        if money >= coffee_cost:
-            if resources['water'] >= MENU[user_input]['ingredients']['water'] and resources['coffee'] >= MENU[user_input]['ingredients']['coffee']:
-                if user_input == 'latte' or user_input == 'cappuccino':
+        if check_money():
+            if check_resources(MENU[user_input]["ingredients"]):
+                if user_input == 'latte' or user_input == 'cappuccino' or user_input == 'espresso':
                     money -= coffee_cost
-                    resources['water'] -= MENU[user_input]['ingredients']['water']
-                    resources['milk'] -= MENU[user_input]['ingredients']['milk']
-                    resources["coffee"] -= MENU[user_input]['ingredients']['coffee']
-                
-                elif user_input == 'espresso':
-                    money -= coffee_cost
-                    resources['water'] -= MENU[user_input]['ingredients']['water']
-                    resources['coffee'] -= MENU[user_input]['ingredients']['coffee']
+                    make_coffee(MENU[user_input]['ingredients'])
                     
                 money = total - change
                 change_1 = total - money
-                money = total - change_1
                 print("debug",money)
                 print(f"Here is ${change_1} in change.")
                 print(f"Here is your {user_input}.")
@@ -99,6 +108,3 @@ while True:
                 print("Not enough ingredients.")
         else:
             money = total - money
-            print("Not enough money. Refunded.")
-    else:
-        print("Sorry. Not enough resources.")
